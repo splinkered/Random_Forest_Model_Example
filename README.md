@@ -2,5 +2,5 @@ This is an app that uses a model trained using the random forest algorithm to us
 
 Dataset link: https://www.kaggle.com/datasets/fatemehmohammadinia/heart-attack-dataset-tarik-a-rashid
 
-I trained the model using the sklearn library in python and pandas to read the csv file of my dataset.
+I trained the model using the sklearn library in python and pandas in google colab notebook to read the csv file of my dataset.
 Deployment done using fastAPI to serve frontend and Vercel for hosting
