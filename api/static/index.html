@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Heart Attack Prediction</title>
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="./static/uikit/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="./static/uikit/js/uikit.min.js"></script>
+    <script src="./static/uikit/js/uikit-icons.min.js"></script>
+   <!--  <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+            max-width: 600px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style> -->
+</head>
+<body>
+
+<nav class="uk-navbar-container">
+    <div class="uk-container">
+        <div uk-navbar>
+            <div class="uk-navbar-center">               
+                <p class="uk-navbar-item uk-logo uk-text-bold">Heart Attack Risk Predictor</p>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class ="uk-padding">
+<div class="uk-card uk-card-default uk-padding uk-margin" style="border: 2px solid #888;border-radius: 20px">
+   
+    <div class="uk-card-body">
+         <form class="uk-form-stacked uk-margin-large" onsubmit="event.preventDefault(); predict();">
+
+            <legend class="uk-legend">Enter Patient Details</legend>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Age *</label>
+                <div class="uk-form-controls">
+                    <input required class="uk-input" type="number" id="age" placeholder="Enter age">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Gender *</label>
+                <div class="uk-form-controls">
+                    <select required class="uk-select" id="gender">
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="0">Female</option>
+                        <option value="1">Male</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Heart Rate (bpm) *</label>
+                <div class="uk-form-controls">
+                    <input required class="uk-input" type="number" id="hr" placeholder="Enter heart rate">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Systolic Blood Pressure (SBP) *</label>
+                <div class="uk-form-controls">
+                    <input required class="uk-input" type="number" id="sbp" placeholder="Enter SBP">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Diastolic Blood Pressure (DBP) *</label>
+                <div class="uk-form-controls">
+                    <input required class="uk-input" type="number" id="dbp" placeholder="Enter DBP">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Blood Sugar (mg/dL) *</label>
+                <div class="uk-form-controls">
+                    <input required class="uk-input" type="number" id="sugar" step="0.1" placeholder="Enter blood sugar">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">CK-MB (ng/mL) *</label>
+                <div class="uk-form-controls">
+                    <input required class="uk-input" type="number" id="ckmb" step="0.1" placeholder="Enter CK-MB">
+                </div>
+            </div>
+
+            <div class="uk-margin">
+                <label class="uk-form-label">Troponin (ng/mL) *</label>
+                <div class="uk-form-controls">
+                    <input required class="uk-input" type="number" id="troponin" step="0.001" placeholder="Enter troponin level">
+                </div>
+            </div>
+
+            <button class="uk-button uk-button-primary uk-width-1-1 uk-margin-small-top">
+                Predict
+            </button>
+
+        </form>
+    </div>
+    <div class="uk-card-footer"><div id="result" class="uk-alert-primary uk-padding-small uk-margin">Result: N/A</div></div>
+   
+</div>
+<div class="uk-card uk-card-default uk-padding" style="border: 2px solid #888;border-radius: 20px">
+    <center><h3>Model Metrics</h3></center>
+    <p id="accuracy"></p>
+    <pre id="report"></pre>
+    <img id="cmImage" style="max-width:100%; border:1px solid #ccc;">
+</div>
+</div>
+
+<script>
+async function loadMetrics() {
+    let res = await fetch("./metrics");
+    let data = await res.json();
+
+    document.getElementById("accuracy").innerHTML = 
+        "Accuracy: " + (data.accuracy * 100).toFixed(2) + "%";
+
+    document.getElementById("report").innerText = data.report;
+
+    document.getElementById("cmImage").src = data.confusion_matrix_image;
+}
+
+loadMetrics();
+
+async function predict() {
+    let data = {
+        "Age": parseInt(document.getElementById("age").value),
+        "Gender": parseInt(document.getElementById("gender").value),
+        "Heart rate": parseInt(document.getElementById("hr").value),
+        "Systolic blood pressure": parseInt(document.getElementById("sbp").value),
+        "Diastolic blood pressure": parseInt(document.getElementById("dbp").value),
+        "Blood sugar": parseFloat(document.getElementById("sugar").value),
+        "CK-MB": parseFloat(document.getElementById("ckmb").value),
+        "Troponin": parseFloat(document.getElementById("troponin").value)
+    };
+
+    let res = await fetch("./predict", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    let result = await res.json();
+    document.getElementById("result").innerHTML =
+        "Prediction: " + result.prediction.toUpperCase();
+}
+</script>
+
+</body>
+</html>
