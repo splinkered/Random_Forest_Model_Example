@@ -26,6 +26,11 @@ def home():
 model = pickle.load(open("heart_model.pkl", "rb"))
 label_encoder = pickle.load(open("label_encoder.pkl", "rb"))
 
+<<<<<<< HEAD
+=======
+# Generate metrics
+metrics_data = generate_metrics(model, X_test, y_test)
+>>>>>>> 70aee2a8bba826d33e5d29544befa17111e51134
 
 @app.get("/metrics")
 def get_metrics():
